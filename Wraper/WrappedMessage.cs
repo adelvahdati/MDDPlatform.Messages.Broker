@@ -14,7 +14,7 @@ namespace MDDPlatform.Messages.Wraper
         public IDictionary<string, object> Headers { get; set; }
         public WrappedMessage()
         {
-                        
+             
         }
         public WrappedMessage(T body, string? messageId = null, string? correlationId = null, string? messageContext = null, IDictionary<string, object>? headers = null)
         {
