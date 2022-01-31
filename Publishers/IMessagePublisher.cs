@@ -7,6 +7,7 @@ namespace MDDPlatform.Messages.Broker.Publishers
     {
         void Publish(string message,string exchange, string routingKey,string exchangeType);
         Task PubblishAsync<T>(WrappedMessage<T> message,IPublishingStrategy strategy) where T : IMessage;
+        Task PubblishAsync<T>(WrappedMessage<T> message) where T : IMessage;
         
     }
 }

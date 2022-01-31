@@ -38,7 +38,7 @@ namespace MDDPlatform.Messages.Broker.Subscribers
 
         private void OnConnectionShutdown(object? sender, ShutdownEventArgs e)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("--->Subscriber : Connection Shutdown ...");
         }
 
         public void Subscribe(string exchange, string exchangeType, string routingKey, Func<string, Task> handler)
@@ -99,20 +99,81 @@ namespace MDDPlatform.Messages.Broker.Subscribers
                             if (typeof(IEvent).IsAssignableFrom(typeof(T)))
                             {
                                 Console.WriteLine("---> Dispatche to EventHandler");
-                                if(_messageDispatcher== null)
-                                    Console.WriteLine("---> Message Dispatcher is null");
-                                if(orginalMessage==null)
-                                    Console.WriteLine("Orginal Message is null")                                    ;
-                                    
-                                await _messageDispatcher.HandleAsync((IEvent)orginalMessage);
+                                if (_messageDispatcher == null) Console.WriteLine("---> Message Dispatcher is null");
+                                if (orginalMessage == null) Console.WriteLine("Orginal Message is null");
+
+                                if (_messageDispatcher != null && orginalMessage != null)
+                                    await _messageDispatcher.HandleAsync((IEvent)orginalMessage);
                             }
                             if (typeof(ICommand).IsAssignableFrom(typeof(T)))
                             {
                                 Console.WriteLine("---> Dispatche to CommandHandler");
-                                await _messageDispatcher.HandleAsync((ICommand)orginalMessage);
+                                if (_messageDispatcher != null && orginalMessage != null)
+                                    await _messageDispatcher.HandleAsync((ICommand)orginalMessage);
                             }
                         }
-                        else{
+                        else
+                        {
+                            Console.WriteLine("---> Deserialized Message is null");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                };
+                _channel.BasicConsume(_queueName, autoAck: true, consumer);
+
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task SubscribeAsync<T>() where T : IMessage
+        {
+            ChannelAttributes channelAttribute = _configuration.ResolveBindingPolicy<T>();
+
+            if (_connection.IsOpen)
+            {
+                if (!_exchanges.Contains(channelAttribute.Exchange))
+                {
+                    _channel.ExchangeDeclare(channelAttribute.Exchange, channelAttribute.ExchangeType);
+                    _exchanges.Add(channelAttribute.Exchange);
+                }
+                var _queueName = _channel.QueueDeclare().QueueName;
+                _channel.QueueBind(_queueName, channelAttribute.Exchange, channelAttribute.RoutingKey);
+
+                var consumer = new EventingBasicConsumer(_channel);
+                consumer.Received += async (model, ea) =>
+                {
+                    var body = ea.Body;
+                    var message = Encoding.UTF8.GetString(body.ToArray());
+                    Console.WriteLine("---> Message Received By Subscriber : " + message);
+                    try
+                    {
+                        var wrrapedMessage = JsonConvert.DeserializeObject<WrappedMessage<T>>(message);
+                        Console.WriteLine("---> Message Deserialized in Event Consumer");
+                        if (wrrapedMessage != null)
+                        {
+                            T orginalMessage = wrrapedMessage.Body;
+                            Console.WriteLine("---> Body is extracted");
+                            if (typeof(IEvent).IsAssignableFrom(typeof(T)))
+                            {
+                                Console.WriteLine("---> Dispatche to EventHandler");
+                                if (_messageDispatcher == null) Console.WriteLine("---> Message Dispatcher is null");
+                                if (orginalMessage == null) Console.WriteLine("Orginal Message is null");
+
+                                if (_messageDispatcher != null && orginalMessage != null)
+                                    await _messageDispatcher.HandleAsync((IEvent)orginalMessage);
+                            }
+                            if (typeof(ICommand).IsAssignableFrom(typeof(T)))
+                            {
+                                Console.WriteLine("---> Dispatche to CommandHandler");
+                                if (_messageDispatcher != null && orginalMessage != null)
+                                    await _messageDispatcher.HandleAsync((ICommand)orginalMessage);
+                            }
+                        }
+                        else
+                        {
                             Console.WriteLine("---> Deserialized Message is null");
                         }
                     }
