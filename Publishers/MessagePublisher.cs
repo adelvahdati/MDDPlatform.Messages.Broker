@@ -59,16 +59,13 @@ namespace MDDPlatform.Messages.Broker.Publishers
 
         public Task PubblishAsync<T>(WrappedMessage<T> message) where T : IMessage
         {
-            Console.WriteLine("---> PublishAsync Approach2 started...");
             IChannelAttributes channelAttributes = _configuration.ResolveRoutingPolicy<T>(message.Body);
-            Console.WriteLine("---->Resolved Finished");
             var exchange = channelAttributes.Exchange;
             var exchangeType = channelAttributes.ExchangeType;
             var routingKey = channelAttributes.RoutingKey;
-            Console.Write(string.Format(" ---> Channel attribute for publish : {0},{1},{2}",exchange,routingKey,exchangeType));
             var txtMessage = JsonSerializer.Serialize<WrappedMessage<T>>(message);
-            Console.WriteLine("---> Serialized Message : " + txtMessage);
             Publish(txtMessage, exchange, routingKey, exchangeType);
+            Console.Write(string.Format(" ---> Message Published to the Channel : {0},{1},{2}",exchange,routingKey,exchangeType));
             return Task.CompletedTask;
         }
     }

@@ -1,4 +1,3 @@
-using MDDPlatform.Messages.Broker.Exctensions;
 using MDDPlatform.Messages.Core;
 
 namespace MDDPlatform.Messages.Broker.Options
@@ -21,35 +20,8 @@ namespace MDDPlatform.Messages.Broker.Options
             PlaceholderDictionary.Add(BaseType, new BaseTypePlaceholder());
             PlaceholderDictionary.Add(FullName, new FullnamePlaceholder());
         }
-
-        public IPlaceholder GetPlaceholder(string template)
-        {
-            if (template.Length == 0) return new PlainTextPlaceHolder(template);
-
-            if (PlaceholderDictionary.ContainsKey(template))
-                return PlaceholderDictionary[template];
-
-            if (template.IsValidPlaceholder())
-                return new PropertyPlaceholder(template);
-
-            return new CompositePlaceholder(template);
-        }
-
         public string ResolvePlaceholder<TMessage>(string template, TMessage message) where TMessage : IMessage
         {
-            // var placeholder = GetPlaceholder(template);
-            // return placeholder.Resolve<TMessage>(message);
-
-            // if(string.IsNullOrEmpty(template)) return "";
-
-            // Dictionary<string,string> typeLevelKeyValuePairs = ExtractTypeLevelProperties<TMessage>(template);
-            // Dictionary<string,string> objectLevelKeyValuePairs = ExtractObjectLevelProperties<TMessage>(template,message);
-
-            // string objectLevelReplacement = ReplacePlaceholderValue(template,objectLevelKeyValuePairs);
-            // string result = ReplacePlaceholderValue(objectLevelReplacement,typeLevelKeyValuePairs);
-
-            // return result;
-
             if (string.IsNullOrEmpty(template)) return "";
             string input = template;
 
@@ -93,14 +65,6 @@ namespace MDDPlatform.Messages.Broker.Options
         }
         public string ResolvePlaceholder<TMessage>(string template) where TMessage : IMessage
         {
-            // var placeholder = GetPlaceholder(template);
-            // return placeholder.Resolve<TMessage>();
-
-            //if(string.IsNullOrEmpty(template)) return "";
-
-            // Dictionary<string,string> keyValuePairs = ExtractTypeLevelProperties<TMessage>(template);
-            // return ReplacePlaceholderValue(template,keyValuePairs);
-
             if (string.IsNullOrEmpty(template)) return "";
             string input = template;
 
@@ -121,62 +85,6 @@ namespace MDDPlatform.Messages.Broker.Options
             }
             return input;
         }
-        // private Dictionary<string, string> ExtractTypeLevelProperties<TMessage>(string template) where TMessage : IMessage
-        // {
-        //     if (template == null) return new Dictionary<string, string>();
-        //     if (template.Length == 0) return new Dictionary<string, string>();
-
-        //     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-        //     foreach (var key in PlaceholderDictionary.Keys)
-        //     {
-        //         if (template.Contains(key, StringComparison.CurrentCultureIgnoreCase))
-        //         {
-        //             string value = PlaceholderDictionary[key].Resolve<TMessage>();
-        //             keyValuePairs.Add(key, value);
-        //         }
-        //     }
-        //     return keyValuePairs;
-        // }
-
-        // private Dictionary<string, string> ExtractObjectLevelProperties<TMessage>(string template, TMessage message) where TMessage : IMessage
-        // {
-        //     if (string.IsNullOrEmpty(template)) return new Dictionary<string, string>();
-
-        //     if (message == null) return new Dictionary<string, string>();
-
-        //     Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-
-        //     Type type = message.GetType();
-        //     var properties = type.GetProperties();
-
-        //     foreach (var property in properties)
-        //     {
-        //         var propName = property.Name;
-        //         if (propName != null)
-        //         {
-        //             var propTemplate = "{" + propName.Trim() + "}";
-        //             if (template.Contains(propTemplate, StringComparison.CurrentCultureIgnoreCase))
-        //             {
-        //                 var propValue = property.GetValue(message);
-        //                 keyValuePairs.Add(propTemplate, StringValue(propValue));
-        //             }
-        //         }
-        //     }
-        //     return keyValuePairs;
-        // }
-
-
-        // private string ReplacePlaceholderValue(string template, Dictionary<string, string> keyValuePairs)
-        // {
-        //     if (string.IsNullOrEmpty(template)) return "";
-
-        //     string input = template;
-        //     foreach (var item in keyValuePairs)
-        //     {
-        //         input = input.Replace(item.Key, item.Value, StringComparison.CurrentCultureIgnoreCase);
-        //     }
-        //     return input;
-        // }
 
         private string StringValue(object? propValue)
         {

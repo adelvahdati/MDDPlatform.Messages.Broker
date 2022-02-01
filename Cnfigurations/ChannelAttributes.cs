@@ -4,11 +4,6 @@ namespace MDDPlatform.Messages.BrokerConfiguration
 {
     public class ChannelAttributes : IChannelAttributes 
     {
-        // private readonly string _exchange;
-        // private readonly string _routingKey;
-        // private readonly string _queue;
-        // private readonly string _exchangeType;
-
         public string Exchange {get; set;}
 
         public string RoutingKey {get; set;}

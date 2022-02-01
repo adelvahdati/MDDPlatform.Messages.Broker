@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using MDDPlatform.Messages.Broker.Exctensions;
 using MDDPlatform.Messages.Core;
 
 namespace MDDPlatform.Messages.Broker.Options
@@ -32,23 +30,6 @@ namespace MDDPlatform.Messages.Broker.Options
             return ResolvePlaceHolder(type);
         }
     }
-    internal class PlainTextPlaceHolder : Placeholder
-    {
-        private string input;
-        public override string Template => input;
-
-        public PlainTextPlaceHolder(string input)
-        {
-            this.input = input;
-        }
-
-
-        protected override string ResolvePlaceHolder(Type type)
-        {
-            return input;
-        }
-    }
-
     internal class FullnamePlaceholder : Placeholder
     {
         public override string Template => PlaceholderRegistery.FullName;
@@ -115,103 +96,6 @@ namespace MDDPlatform.Messages.Broker.Options
             if (type.Namespace == null) return PlaceholderRegistery.Namespace;
 
             return type.Namespace;
-        }
-    }
-    internal class PropertyPlaceholder : IPlaceholder
-    {
-        private readonly string _input;
-
-        public string Template => _input;
-        public PropertyPlaceholder(string input)
-        {
-            if(input==null)
-                _input=string.Empty;
-            else
-                _input = input;            
-        }
-
-        public string Resolve<TMessage>(TMessage message) where TMessage : IMessage
-        {
-            var insideText = _input.ExtractPlaceholderVariable();
-            if (insideText == null) return _input;
-
-            if (message == null) return _input;
-            Type type = message.GetType();
-            var properties = type.GetProperties();
-
-            foreach (var property in properties)
-            {
-                var propName = property.Name;
-                if (propName != null)
-                {
-                    if (propName.Equals(insideText, StringComparison.CurrentCultureIgnoreCase))
-                    {                        
-                        var propValue = property.GetValue(message);
-                        if (propValue == null) return _input;
-                        return ((string)propValue);
-                    }
-                }
-            }
-            return _input;
-        }
-
-        public string Resolve<TMessage>() where TMessage : IMessage
-        {
-            return _input;
-        }
-    }
-    internal class CompositePlaceholder : IPlaceholder
-    {
-        private string _input;
-        private List<IPlaceholder> _placeholders;
-        public string Template => _input;
-
-        public CompositePlaceholder(string input)
-        {
-            _input = input;
-            _placeholders = new List<IPlaceholder>();
-
-            PlaceholderRegistery registery = new PlaceholderRegistery();
-
-            List<string> textBloks = input.GetPlaceHolders();
-
-            if (textBloks.Count == 0)
-                _placeholders.Add(new PlainTextPlaceHolder(input));
-            else
-            {
-                foreach (var textBlok in textBloks)
-                {
-                    var placeholder = registery.GetPlaceholder(textBlok);
-                    _placeholders.Add(placeholder);
-                }
-
-            }
-        }
-        public string Resolve<TMessage>() where TMessage : IMessage
-        {
-            var input = Template;
-            if(input== null) return string.Empty;
-            if(input.Length == 0) return input;
-            foreach (var item in _placeholders)
-            {
-                var value = item.Resolve<TMessage>();
-                input = input.Replace(item.Template, value);
-            }
-            return input;
-        }
-
-        public string Resolve<TMessage>(TMessage message) where TMessage : IMessage
-        {
-            var input = Template;
-            if(input== null) return string.Empty;
-            if(input.Length==0) return input;
-            foreach (var item in _placeholders)
-            {
-                var value = item.Resolve<TMessage>(message);
-                input = input.Replace(item.Template, value);
-            }
-            Console.WriteLine("---> Composite Placehoder resolved to : " + input);
-            return input;
         }
     }
 }

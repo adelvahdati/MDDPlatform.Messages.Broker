@@ -62,8 +62,6 @@ namespace MDDPlatform.Messages.Broker.Subscribers
 
                     var body = ea.Body;
                     var message = Encoding.UTF8.GetString(body.ToArray());
-                    Console.WriteLine("---> Message Received from routingKey : " + ea.RoutingKey);
-                    Console.WriteLine("---> Message is : " + message);
                     await handler(message);
                 };
                 _channel.BasicConsume(_queueName, autoAck: true, consumer);
@@ -93,14 +91,11 @@ namespace MDDPlatform.Messages.Broker.Subscribers
                     try
                     {
                         var wrrapedMessage = JsonConvert.DeserializeObject<WrappedMessage<T>>(message);
-                        Console.WriteLine("---> Message Deserialized in Event Consumer");
                         if (wrrapedMessage != null)
                         {
                             T orginalMessage = wrrapedMessage.Body;
-                            Console.WriteLine("---> Body is extracted");
                             if (typeof(IEvent).IsAssignableFrom(typeof(T)))
                             {
-                                Console.WriteLine("---> Dispatche to EventHandler");
                                 if (_messageDispatcher == null) Console.WriteLine("---> Message Dispatcher is null");
                                 if (orginalMessage == null) Console.WriteLine("Orginal Message is null");
 
@@ -109,7 +104,6 @@ namespace MDDPlatform.Messages.Broker.Subscribers
                             }
                             if (typeof(ICommand).IsAssignableFrom(typeof(T)))
                             {
-                                Console.WriteLine("---> Dispatche to CommandHandler");
                                 if (_messageDispatcher != null && orginalMessage != null)
                                     await _messageDispatcher.HandleAsync((ICommand)orginalMessage);
                             }
