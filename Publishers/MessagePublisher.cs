@@ -32,16 +32,6 @@ namespace MDDPlatform.Messages.Broker.Publishers
             Console.WriteLine("---> Message Publisher Connected to RabbitMQ");
         }
 
-        public Task PubblishAsync<T>(WrappedMessage<T> message,IPublishingStrategy strategy) where T : IMessage
-        {            
-            var exchange = strategy.Exchange;
-            var exchangeType = strategy.ExchangeType;
-            var routingKey = strategy.RoutingKey;
-            var txtMessage = JsonSerializer.Serialize<WrappedMessage<T>>(message);
-            Publish(txtMessage, exchange, routingKey, exchangeType);
-            return Task.CompletedTask;
-        }
-
         public void Publish(string message, string exchange, string routingKey, string exchangeType)
         {
             if (_connection.IsOpen)
@@ -64,7 +54,22 @@ namespace MDDPlatform.Messages.Broker.Publishers
 
         private void OnConnectionShutdown(object? sender, ShutdownEventArgs e)
         {
-            Console.WriteLine("---> Connection Shutdown ...");
+            Console.WriteLine("---> Publisher : Connection Shutdown ...");
+        }
+
+        public Task PubblishAsync<T>(WrappedMessage<T> message) where T : IMessage
+        {
+            Console.WriteLine("---> PublishAsync Approach2 started...");
+            IChannelAttributes channelAttributes = _configuration.ResolveRoutingPolicy<T>(message.Body);
+            Console.WriteLine("---->Resolved Finished");
+            var exchange = channelAttributes.Exchange;
+            var exchangeType = channelAttributes.ExchangeType;
+            var routingKey = channelAttributes.RoutingKey;
+            Console.Write(string.Format(" ---> Channel attribute for publish : {0},{1},{2}",exchange,routingKey,exchangeType));
+            var txtMessage = JsonSerializer.Serialize<WrappedMessage<T>>(message);
+            Console.WriteLine("---> Serialized Message : " + txtMessage);
+            Publish(txtMessage, exchange, routingKey, exchangeType);
+            return Task.CompletedTask;
         }
     }
 }
