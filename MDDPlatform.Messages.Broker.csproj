@@ -4,6 +4,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>MDDPlatform.Messages.Broker</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Adel Vahdati</Authors>
+    <Description>Message Bus Library</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTag>Message Bus, Publisher, Subscriber, RabbitMQ</PackageTag>
+    <RepositoryUrl>https://github.com/adelvahdati/MDDPlatform.Messages.Broker</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
