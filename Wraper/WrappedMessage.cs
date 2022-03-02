@@ -1,6 +1,6 @@
 using MDDPlatform.Messages.Core;
 
-namespace MDDPlatform.Messages.Wraper
+namespace MDDPlatform.Messages.Wrapers
 {
     public class WrappedMessage<T> where T : IMessage
     {

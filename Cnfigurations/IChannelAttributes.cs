@@ -1,4 +1,4 @@
-namespace MDDPlatform.Messages.BrokerConfiguration
+namespace MDDPlatform.Messages.Brokers.Configurations
 {
     public interface IChannelAttributes
     {

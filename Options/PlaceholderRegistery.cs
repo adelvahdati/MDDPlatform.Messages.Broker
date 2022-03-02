@@ -1,6 +1,6 @@
 using MDDPlatform.Messages.Core;
 
-namespace MDDPlatform.Messages.Broker.Options
+namespace MDDPlatform.Messages.Brokers.Options
 {
     internal class PlaceholderRegistery
     {
@@ -90,6 +90,72 @@ namespace MDDPlatform.Messages.Broker.Options
         {
             if (propValue == null) return "";
             return (string)propValue;
+        }
+        public string ResolvePlaceholder(Type type, string template, IMessage message)
+        {
+            if (string.IsNullOrEmpty(template)) return "";
+            string input = template;
+
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+            foreach (var key in PlaceholderDictionary.Keys)
+            {
+                if (input.Contains(key, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string value = PlaceholderDictionary[key].ResolvePlaceHolder(type);
+                    string flaggedPlaceholder = string.Format("[{0}]", Guid.NewGuid().ToString());
+                    input = input.Replace(key, flaggedPlaceholder);
+                    keyValuePairs.Add(flaggedPlaceholder, value);
+                }
+            }
+            if (message != null)
+            {
+                Type _type = message.GetType();
+                var properties = _type.GetProperties();
+
+                foreach (var property in properties)
+                {
+                    var propName = property.Name;
+                    if (propName != null)
+                    {
+                        var propTemplate = "{" + propName.Trim() + "}";
+                        if (input.Contains(propTemplate, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            var propValue = property.GetValue(message);
+                            string flaggedPlaceholder = string.Format("[{0}]", Guid.NewGuid().ToString());
+                            input = input.Replace(propTemplate, flaggedPlaceholder);
+                            keyValuePairs.Add(flaggedPlaceholder, StringValue(propValue));
+                        }
+                    }
+                }
+            }
+            foreach (var item in keyValuePairs)
+            {
+                input = input.Replace(item.Key, item.Value);
+            }
+            return input;
+        }
+
+        public string ResolvePlaceholder(Type type , string template)
+        {
+            if (string.IsNullOrEmpty(template)) return "";
+            string input = template;
+
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+            foreach (var key in PlaceholderDictionary.Keys)
+            {
+                if (input.Contains(key, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string value = PlaceholderDictionary[key].ResolvePlaceHolder(type);
+                    string flaggedPlaceholder = string.Format("[{0}]", Guid.NewGuid().ToString());
+                    input = input.Replace(key, flaggedPlaceholder);
+                    keyValuePairs.Add(flaggedPlaceholder, value);
+                }
+            }
+            foreach (var item in keyValuePairs)
+            {
+                input = input.Replace(item.Key, item.Value);
+            }
+            return input;
         }
     }
 }

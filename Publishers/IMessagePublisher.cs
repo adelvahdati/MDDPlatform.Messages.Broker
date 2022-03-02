@@ -1,7 +1,7 @@
 using MDDPlatform.Messages.Core;
-using MDDPlatform.Messages.Wraper;
+using MDDPlatform.Messages.Wrapers;
 
-namespace MDDPlatform.Messages.Broker.Publishers
+namespace MDDPlatform.Messages.Brokers.Publishers
 {
     public interface IMessagePublisher
     {

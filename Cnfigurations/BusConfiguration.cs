@@ -1,10 +1,10 @@
-using MDDPlatform.Messages.Broker.Options;
-using MDDPlatform.Messages.Broker.Publishers;
-using MDDPlatform.Messages.Broker.Subscribers;
+using MDDPlatform.Messages.Brokers.Options;
+using MDDPlatform.Messages.Brokers.Publishers;
+using MDDPlatform.Messages.Brokers.Subscribers;
 using MDDPlatform.Messages.Core;
 
 
-namespace MDDPlatform.Messages.BrokerConfiguration
+namespace MDDPlatform.Messages.Brokers.Configurations
 {
     public class BusConfiguration : IBusConfiguration
     {
@@ -66,6 +66,14 @@ namespace MDDPlatform.Messages.BrokerConfiguration
         public BindingPolicy GetBindingPolicy<TMessage>() where TMessage : IMessage
         {
             var messageType = typeof(TMessage).Name;
+            return BindingPolicyOf(messageType);
+        }
+        public BindingPolicy GetBindingPolicy(Type type)
+        {
+            var messageType = type.Name;
+            return BindingPolicyOf(messageType);
+        }
+        private BindingPolicy BindingPolicyOf(string messageType){
             BindingPolicy? _policy = _bindingPolicies.Where(bp => bp.MessageType == messageType).FirstOrDefault();
             if(_policy!=null)
                 return _policy;
@@ -80,6 +88,14 @@ namespace MDDPlatform.Messages.BrokerConfiguration
         public RoutingPolicy GetRoutingPolicy<TMessage>() where TMessage : IMessage
         {
             var messageType = typeof(TMessage).Name;
+            return GetRoutingPolicyOf(messageType);
+        }
+        public RoutingPolicy GetRoutingPolicy(Type type)
+        {
+            var messageType = type.Name;
+            return GetRoutingPolicyOf(messageType);
+        }
+        private RoutingPolicy GetRoutingPolicyOf(string messageType){
             RoutingPolicy? _policy = _routingPolicies.Where(rp => rp.MessageType == messageType).FirstOrDefault();
             if(_policy!=null)
                 return _policy;
@@ -89,6 +105,7 @@ namespace MDDPlatform.Messages.BrokerConfiguration
             }
             return new RoutingPolicy(messageType,messageType,"","","topic");
         }
+
 
         public IChannelAttributes ResolveBindingPolicy<TMessage>() where TMessage : IMessage
         {
@@ -100,6 +117,17 @@ namespace MDDPlatform.Messages.BrokerConfiguration
         {
             var policy = GetRoutingPolicy<TMessage>();
             return policy.Resolve<TMessage>(message);
+        }
+        public IChannelAttributes ResolveBindingPolicy(Type type)
+        {
+            var policy = GetBindingPolicy(type);
+            return policy.Resolve(type);
+
+        }
+        public IChannelAttributes ResolveRoutingPolicy(Type type, IMessage message)
+        {
+            var policy = GetRoutingPolicy(type);
+            return policy.Resolve(type,message);
         }
     }
 }

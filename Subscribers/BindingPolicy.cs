@@ -1,8 +1,8 @@
-using MDDPlatform.Messages.Broker.Options;
-using MDDPlatform.Messages.BrokerConfiguration;
+using MDDPlatform.Messages.Brokers.Configurations;
+using MDDPlatform.Messages.Brokers.Options;
 using MDDPlatform.Messages.Core;
 
-namespace MDDPlatform.Messages.Broker.Subscribers
+namespace MDDPlatform.Messages.Brokers.Subscribers
 {
     public class BindingPolicy
     {
@@ -35,6 +35,16 @@ namespace MDDPlatform.Messages.Broker.Subscribers
             string exchange = registery.ResolvePlaceholder<TMessage>(ExchangeTemplate);
             string routingKey = registery.ResolvePlaceholder<TMessage>(RoutingKeyTemplate);
             string queue = registery.ResolvePlaceholder<TMessage>(QueueTemplate);
+
+            return new ChannelAttributes(exchange,routingKey,queue,ExchangeType);
+        }
+
+        internal IChannelAttributes Resolve(Type type)
+        {
+            var registery  = new PlaceholderRegistery();
+            string exchange = registery.ResolvePlaceholder(type,ExchangeTemplate);
+            string routingKey = registery.ResolvePlaceholder(type,RoutingKeyTemplate);
+            string queue = registery.ResolvePlaceholder(type,QueueTemplate);
 
             return new ChannelAttributes(exchange,routingKey,queue,ExchangeType);
 

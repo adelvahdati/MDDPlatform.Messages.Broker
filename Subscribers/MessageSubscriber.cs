@@ -1,15 +1,16 @@
 using System.Text;
-using MDDPlatform.Messages.BrokerConfiguration;
 using MDDPlatform.Messages.Commands;
 using MDDPlatform.Messages.Core;
 using MDDPlatform.Messages.Events;
-using MDDPlatform.Messages.MessageDispatcher;
-using MDDPlatform.Messages.Wraper;
+using MDDPlatform.Messages.Dispatchers;
+using MDDPlatform.Messages.Wrapers;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using MDDPlatform.Messages.Broker.Subscribers;
+using MDDPlatform.Messages.Brokers.Configurations;
 
-namespace MDDPlatform.Messages.Broker.Subscribers
+namespace MDDPlatform.Messages.Brokers.Subscribers
 {
     public class MessageSubscriber : IMessageSubscriber
     {

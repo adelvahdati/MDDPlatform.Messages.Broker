@@ -1,7 +1,8 @@
-using MDDPlatform.Messages.Broker.Publishers;
-using MDDPlatform.Messages.Broker.Subscribers;
+using MDDPlatform.Messages.Brokers.Publishers;
+using MDDPlatform.Messages.Brokers.Subscribers;
 
-namespace MDDPlatform.Messages.Broker.Options{
+namespace MDDPlatform.Messages.Brokers.Options
+{
     public class  RabbitMQOption
     {
         public string HostName { get; set; }
@@ -13,7 +14,8 @@ namespace MDDPlatform.Messages.Broker.Options{
 
         public RabbitMQOption()
         {
-            
+            binding = new List<BindingPolicy>();
+            routing = new List<RoutingPolicy>(); 
         }
     }
 

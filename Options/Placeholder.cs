@@ -1,6 +1,6 @@
 using MDDPlatform.Messages.Core;
 
-namespace MDDPlatform.Messages.Broker.Options
+namespace MDDPlatform.Messages.Brokers.Options
 {
     public interface IPlaceholder
     {
@@ -12,7 +12,7 @@ namespace MDDPlatform.Messages.Broker.Options
     {
 
         public abstract string Template { get; }
-        protected abstract string ResolvePlaceHolder(Type type);
+        public abstract string ResolvePlaceHolder(Type type);
 
         public string Resolve<TMessage>() where TMessage : IMessage
         {
@@ -33,7 +33,7 @@ namespace MDDPlatform.Messages.Broker.Options
     internal class FullnamePlaceholder : Placeholder
     {
         public override string Template => PlaceholderRegistery.FullName;
-        protected override string ResolvePlaceHolder(Type type)
+        public override string ResolvePlaceHolder(Type type)
         {
             if (type == null) return PlaceholderRegistery.FullName;
             if (type.FullName == null) return PlaceholderRegistery.FullName;
@@ -47,7 +47,7 @@ namespace MDDPlatform.Messages.Broker.Options
     {
         public override string Template => PlaceholderRegistery.BaseType;
 
-        protected override string ResolvePlaceHolder(Type type)
+        public override string ResolvePlaceHolder(Type type)
         {
             if (type == null) return PlaceholderRegistery.BaseType;
             if (type.BaseType == null) return PlaceholderRegistery.BaseType;
@@ -60,7 +60,7 @@ namespace MDDPlatform.Messages.Broker.Options
     {
         public override string Template => PlaceholderRegistery.Assembly;
 
-        protected override string ResolvePlaceHolder(Type type)
+        public override string ResolvePlaceHolder(Type type)
         {
             if (type == null) return PlaceholderRegistery.Assembly;
             if (type.Assembly == null) return PlaceholderRegistery.Assembly;
@@ -77,7 +77,7 @@ namespace MDDPlatform.Messages.Broker.Options
     {
         public override string Template => PlaceholderRegistery.Type;
 
-        protected override string ResolvePlaceHolder(Type type)
+        public override string ResolvePlaceHolder(Type type)
         {
             if (type == null) return PlaceholderRegistery.Type;
             if (type.Name == null) return PlaceholderRegistery.Type;
@@ -90,7 +90,7 @@ namespace MDDPlatform.Messages.Broker.Options
     {
         public override string Template => PlaceholderRegistery.Namespace;
 
-        protected override string ResolvePlaceHolder(Type type)
+        public override string ResolvePlaceHolder(Type type)
         {
             if (type == null) return PlaceholderRegistery.Namespace;
             if (type.Namespace == null) return PlaceholderRegistery.Namespace;

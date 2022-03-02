@@ -1,6 +1,4 @@
-using MDDPlatform.Messages.Broker.Options;
-
-namespace MDDPlatform.Messages.BrokerConfiguration 
+namespace MDDPlatform.Messages.Brokers.Configurations
 {
     public class ChannelAttributes : IChannelAttributes 
     {

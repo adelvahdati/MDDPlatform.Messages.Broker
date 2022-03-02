@@ -1,11 +1,11 @@
 using System.Text;
 using System.Text.Json;
-using MDDPlatform.Messages.BrokerConfiguration;
+using MDDPlatform.Messages.Brokers.Configurations;
 using MDDPlatform.Messages.Core;
-using MDDPlatform.Messages.Wraper;
+using MDDPlatform.Messages.Wrapers;
 using RabbitMQ.Client;
 
-namespace MDDPlatform.Messages.Broker.Publishers
+namespace MDDPlatform.Messages.Brokers.Publishers
 {
     public class MessagePublisher : IMessagePublisher
     {
