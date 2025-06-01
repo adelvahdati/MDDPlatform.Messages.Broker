@@ -29,7 +29,6 @@ namespace MDDPlatform.Messages.Brokers.Publishers
             _connection.ConnectionShutdown += OnConnectionShutdown;
 
             _channel = _connection.CreateModel();
-            Console.WriteLine("---> Message Publisher Connected to RabbitMQ");
         }
 
         public void Publish(string message, string exchange, string routingKey, string exchangeType)
@@ -48,13 +47,11 @@ namespace MDDPlatform.Messages.Brokers.Publishers
                                         basicProperties: null,
                                         body: body);
 
-                Console.WriteLine("---> Message Published : " + message);
             }
         }
 
         private void OnConnectionShutdown(object? sender, ShutdownEventArgs e)
         {
-            Console.WriteLine("---> Publisher : Connection Shutdown ...");
         }
 
         public Task PubblishAsync<T>(WrappedMessage<T> message) where T : IMessage
@@ -65,7 +62,6 @@ namespace MDDPlatform.Messages.Brokers.Publishers
             var routingKey = channelAttributes.RoutingKey;
             var txtMessage = JsonSerializer.Serialize<WrappedMessage<T>>(message);
             Publish(txtMessage, exchange, routingKey, exchangeType);
-            Console.Write(string.Format(" ---> Message Published to the Channel : {0},{1},{2}",exchange,routingKey,exchangeType));
             return Task.CompletedTask;
         }
     }

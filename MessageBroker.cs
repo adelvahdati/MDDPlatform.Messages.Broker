@@ -34,11 +34,9 @@ namespace MDDPlatform.Messages.Brokers
             _connection.ConnectionShutdown += OnConnectionShutdown;
 
             _channel = _connection.CreateModel();
-            Console.WriteLine("---> Message Publisher Connected to RabbitMQ");
         }
         private void OnConnectionShutdown(object? sender, ShutdownEventArgs e)
         {
-            Console.WriteLine("---> Publisher : Connection Shutdown ...");
         }
         public async Task PublishAsync(IEvent @event)
         {
@@ -104,7 +102,6 @@ namespace MDDPlatform.Messages.Brokers
                 {
                     var body = ea.Body;
                     var message = Encoding.UTF8.GetString(body.ToArray());
-                    Console.WriteLine("---> Message Received By Subscriber : " + message);
                     try
                     {
                         var wrrapedMessage = JsonConvert.DeserializeObject<WrappedMessage<TMessage>>(message);
@@ -113,11 +110,12 @@ namespace MDDPlatform.Messages.Brokers
                             TMessage orginalMessage = wrrapedMessage.Body;
                             if (typeof(IEvent).IsAssignableFrom(typeof(TMessage)))
                             {
-                                if (_messageDispatcher == null) Console.WriteLine("---> Message Dispatcher is null");
-                                if (orginalMessage == null) Console.WriteLine("Orginal Message is null");
 
                                 if (_messageDispatcher != null && orginalMessage != null)
+                                {
                                     await _messageDispatcher.HandleAsync((IEvent)orginalMessage);
+                                }
+                                    
                             }
                             if (typeof(ICommand).IsAssignableFrom(typeof(TMessage)))
                             {
@@ -125,13 +123,10 @@ namespace MDDPlatform.Messages.Brokers
                                     await _messageDispatcher.HandleAsync((ICommand)orginalMessage);
                             }
                         }
-                        else
-                        {
-                            Console.WriteLine("---> Deserialized Message is null");
-                        }
                     }
                     catch (Exception ex)
                     {
+                        Console.WriteLine("Message Broker Exception -> Error to Consume message");
                         Console.WriteLine(ex.Message);
                     }
                 };
@@ -147,7 +142,6 @@ namespace MDDPlatform.Messages.Brokers
             var routingKey = channelAttributes.RoutingKey;
             
             Publish(message, exchange, routingKey, exchangeType);
-            Console.Write(string.Format(" ---> Message Published to the Channel : {0},{1},{2}",exchange,routingKey,exchangeType));
             return Task.CompletedTask;
         }
         private Task Publish(string message, string exchange, string routingKey, string exchangeType)
@@ -166,7 +160,6 @@ namespace MDDPlatform.Messages.Brokers
                                         basicProperties: null,
                                         body: body);
 
-                Console.WriteLine("---> Message Published : " + message);
             }
             return Task.CompletedTask;
         }

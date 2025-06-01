@@ -34,12 +34,10 @@ namespace MDDPlatform.Messages.Brokers.Subscribers
             _connection.ConnectionShutdown += OnConnectionShutdown;
 
             _channel = _connection.CreateModel();
-            Console.WriteLine("---> Message Subscriber Connected to RabbitMQ");
         }
 
         private void OnConnectionShutdown(object? sender, ShutdownEventArgs e)
         {
-            Console.WriteLine("--->Subscriber : Connection Shutdown ...");
         }
 
         public void Subscribe(string exchange, string exchangeType, string routingKey, Func<string, Task> handler)
@@ -55,8 +53,6 @@ namespace MDDPlatform.Messages.Brokers.Subscribers
                 _channel.QueueBind(_queueName, exchange, routingKey);
 
                 var consumer = new EventingBasicConsumer(_channel);
-
-                Console.WriteLine($"Subscriber Listen to the Channel : Exchange : {exchange} , routingKey : {routingKey}");
 
                 consumer.Received += async (model, ea) =>
                 {
@@ -88,7 +84,6 @@ namespace MDDPlatform.Messages.Brokers.Subscribers
                 {
                     var body = ea.Body;
                     var message = Encoding.UTF8.GetString(body.ToArray());
-                    Console.WriteLine("---> Message Received By Subscriber : " + message);
                     try
                     {
                         var wrrapedMessage = JsonConvert.DeserializeObject<WrappedMessage<T>>(message);
@@ -97,9 +92,6 @@ namespace MDDPlatform.Messages.Brokers.Subscribers
                             T orginalMessage = wrrapedMessage.Body;
                             if (typeof(IEvent).IsAssignableFrom(typeof(T)))
                             {
-                                if (_messageDispatcher == null) Console.WriteLine("---> Message Dispatcher is null");
-                                if (orginalMessage == null) Console.WriteLine("Orginal Message is null");
-
                                 if (_messageDispatcher != null && orginalMessage != null)
                                     await _messageDispatcher.HandleAsync((IEvent)orginalMessage);
                             }
@@ -109,13 +101,10 @@ namespace MDDPlatform.Messages.Brokers.Subscribers
                                     await _messageDispatcher.HandleAsync((ICommand)orginalMessage);
                             }
                         }
-                        else
-                        {
-                            Console.WriteLine("---> Deserialized Message is null");
-                        }
                     }
                     catch (Exception ex)
                     {
+                        Console.WriteLine("Error to consume message");
                         Console.WriteLine(ex.Message);
                     }
                 };
